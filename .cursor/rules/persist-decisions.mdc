@@ -1,0 +1,21 @@
+---
+description: Persist scope and build decisions to the project folder so they survive chat loss
+alwaysApply: true
+---
+
+# Persist decisions to the repo
+
+**The project folder is the source of truth for decisions, not the chat.**
+
+When the user and I agree on any of the following, **write those decisions to a file in the project in the same response** (or immediately after), before moving on:
+
+- Scope choices (e.g. A vs B options, "we'll do X not Y")
+- Build or implementation decisions (libraries, formats, where things live)
+- Clarifications that change or pin down PROJECT_SCOPE.md, PROMPTS.md, or SCOPE_DECISIONS.md
+
+**Where to write:**
+- Scope/behavior decisions → `SCOPE_DECISIONS.md` (update the relevant step’s table or add a row).
+- Prompt or build-instruction changes → `PROMPTS.md` or `PROJECT_SCOPE.md` as appropriate.
+- One-off notes → a short note in the right doc or a dedicated `NOTES.md` if needed.
+
+**Habit:** After any back-and-forth where the user picks options or we lock in a decision, ask: "Did I write that to the repo?" If not, write it now. Never leave important decisions only in the chat.
