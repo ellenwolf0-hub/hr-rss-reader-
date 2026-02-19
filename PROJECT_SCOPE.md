@@ -1,5 +1,13 @@
 # Weekly People Team AI Digest — Project Scope
 
+## Constitution (how we build)
+
+- **Prefer simple, readable code** — clarity over cleverness.
+- **Prefer small functions** — do one thing per function; split when logic grows.
+- **Prefer minimal dependencies** — add a library only when the benefit clearly outweighs the cost.
+
+---
+
 ## Vision
 
 Build a **weekly People Team AI Digest** that:

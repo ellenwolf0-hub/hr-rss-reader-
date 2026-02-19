@@ -2,6 +2,8 @@
 
 **You said:** You want to be told exactly what to do, one small step at a time, with clear “click here” guidance. This doc is written that way.
 
+**Your personal reference:** **`ELLEN_CHEAT_SHEET.md`** — your “vibe coding” cheat sheet: how you like to learn, the terms we use (dumbed down), and notes on what you grok vs where you need more support. We’ll update it as we go.
+
 We’ll do three things, in order:
 
 1. **Back up this project with GitHub** (version control)
@@ -59,14 +61,14 @@ Goal: put your **hr-rss-reader** project on GitHub so it’s backed up and you h
 
 1. Go to https://github.com in your browser.
 2. Click the **green “New”** button (or **“+”** in the top right → **“New repository”**).
-3. **Repository name:** type `hr-rss-reader` (or another name you prefer).
+3. **Repository name:** type `hr-rss-reader` or `hr-rss-reader-` (use the same name in the URL in step 1.4).
 4. Leave it **Public**.
 5. **Do not** check “Add a README” or “Add .gitignore” — we already have a project. Leave everything unchecked.
 6. Click **“Create repository”**.
 
 You’ll see a page that says “Quick setup” and shows a URL like  
-`https://github.com/YOUR_USERNAME/hr-rss-reader.git`.  
-Leave that page open.
+`https://github.com/YOUR_USERNAME/hr-rss-reader.git` or `.../hr-rss-reader-.git` (if you added a hyphen at the end).  
+Leave that page open. **Use the exact URL GitHub shows** when you run step 6 below.
 
 **Checkpoint:** Do you see the new empty repo and the URL? (yes/no)
 
@@ -83,7 +85,7 @@ Do these **one at a time** in the **Cursor terminal**. Make sure you’re in the
 | 3 | `git status` (you should see a list of files to be committed) |
 | 4 | `git commit -m "Initial backup of hr-rss-reader"` |
 | 5 | `git branch -M main` |
-| 6 | `git remote add origin https://github.com/YOUR_USERNAME/hr-rss-reader.git` |
+| 6 | `git remote add origin https://github.com/YOUR_USERNAME/hr-rss-reader.git` (or `.../hr-rss-reader-.git` if your repo name has a trailing hyphen — use the **exact** URL from your GitHub repo page) |
 | 7 | `git push -u origin main` |
 
 - For **step 7**, GitHub may ask you to **log in**. Use the browser or token method they show.  
@@ -95,7 +97,8 @@ Do these **one at a time** in the **Cursor terminal**. Make sure you’re in the
 
 ### You’re done with Part 1 when…
 
-- You can open https://github.com/YOUR_USERNAME/hr-rss-reader and see your project files there.
+- You can open your repo in the browser and see your project files there.  
+  **Your repo:** https://github.com/ellenwolf0-hub/hr-rss-reader-
 
 **Next time you want to “back up”:**  
 Run in the terminal:  
@@ -106,6 +109,8 @@ Run in the terminal:
 ---
 
 ## Part 2: Learn GitHub’s Spec Kit (basic assisted programming)
+
+**Your goal (locked in):** Learn to **prompt a build** and understand the **basic infrastructure** of how something gets built — using Spec Kit in **chat only** (no CLI for now).
 
 **What Spec Kit is:** A way to work with an AI assistant in a structured way: you describe **what** you want (a spec), then **plan**, then **tasks**, then the AI helps **implement**. It works inside Cursor (and other AI tools) using special **slash commands**.
 

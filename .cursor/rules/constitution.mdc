@@ -1,0 +1,14 @@
+---
+description: Project constitution — simple code, small functions, minimal dependencies
+alwaysApply: true
+---
+
+# Build principles
+
+When writing or changing code in this project:
+
+- **Simple, readable code** — clarity over cleverness. Avoid unnecessary abstraction.
+- **Small functions** — one clear responsibility per function; split when logic grows.
+- **Minimal dependencies** — add a new library only when the benefit clearly outweighs the cost.
+
+Reference: `PROJECT_SCOPE.md` → Constitution.

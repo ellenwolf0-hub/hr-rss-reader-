@@ -147,3 +147,25 @@ Add Coda integration to the Weekly People Team AI Digest so the digest is **post
 - The digest appears in the designated Coda doc on the scheduled day. No change to the digest format itself; step 4 still produces the same Markdown/content.
 
 **Note:** Step 5 is deferred until the user is ready to set up Coda and a scheduler. The codebase should be structured so that step 5 can be added without rewriting steps 2–4.
+
+---
+
+## Feature spec: Date script
+
+**What I want**
+
+- A small script I can run (e.g. from the command line).
+- When I run it, it prints the current date.
+- No other behavior required.
+
+**Plan (how we build it)**
+
+- **Language:** Python.
+- **Scope:** One file only.
+- **Dependencies:** No new dependencies (use only the standard library).
+
+**Tasks**
+
+1. Create one Python file in the project root (e.g. `print_date.py`) that is runnable from the command line.
+2. In that file, use the standard library to get the current date and print it (e.g. `datetime.date.today()`).
+3. Verify: running `python print_date.py` (or `python3 print_date.py`) prints the current date.
