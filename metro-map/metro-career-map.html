@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Career Map</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      background: #FFFFFF;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px 24px 32px;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.8px; color: #0F0F0F; margin: 0 0 6px 0; }
+    .badge {
+      font-size: 11px; font-weight: 600; background: #F0EBFF; color: #8B5CF6;
+      padding: 3px 9px; border-radius: 99px; letter-spacing: 0.3px;
+      display: inline-block; margin-left: 14px;
+    }
+    .subtitle { color: #9CA3AF; margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; }
+    .toolbar {
+      display: flex; gap: 10px; align-items: center; padding: 12px 0;
+      flex-wrap: wrap; border-bottom: 1px solid #F3F4F6; margin-bottom: 16px;
+    }
+    .toolbar-btn {
+      background: #F4F4F5; border: none; border-radius: 8px;
+      padding: 6px 12px; font-size: 13px; font-weight: 600; color: #444;
+      cursor: pointer; transition: all 0.2s ease; font-family: 'Inter', sans-serif;
+    }
+    .toolbar-btn:hover { background: #E8E8EA; }
+    .toolbar-btn.path-btn.active {
+      background: color-mix(in srgb, var(--path-color) 15%, transparent);
+      color: var(--path-color); border: 1.5px solid var(--path-color);
+    }
+    .toolbar-btn.path-btn .path-btn-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      vertical-align: middle; margin-right: 6px; background: var(--path-color);
+    }
+    .toolbar-btn.btn-draw.active { background: #FF6B35; color: #fff; border: none; }
+    .toolbar-btn.btn-level-overlay.active { background: #F0EBFF; color: #8B5CF6; border: 1.5px solid #8B5CF6; }
+    .toolbar-btn.btn-plot.active { background: color-mix(in srgb, #F59E0B 15%, transparent); color: #B45309; border: 1.5px solid #F59E0B; }
+    .canvas-wrap { position: relative; width: 100%; }
+    .toolbar-divider { width: 1px; height: 20px; background: #E5E7EB; display: inline-block; margin: 0 4px; vertical-align: middle; }
+    #map {
+      width: 100%; background: #FAFAFA; display: block; cursor: default;
+      user-select: none; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    #map.draw-mode { cursor: crosshair; }
+    #map.plot-mode { cursor: crosshair; }
+    .floating-card {
+      position: absolute; top: 16px; right: 16px; width: 220px;
+      background: #fff; border-radius: 10px; padding: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      font-size: 13px; line-height: 1.5; opacity: 0;
+      border-left: 3px solid #8B5CF6;
+      transition: opacity 0.15s ease; pointer-events: none;
+    }
+    .floating-card.visible { opacity: 1; pointer-events: auto; }
+    .floating-card .card-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+    .floating-card .card-body { font-size: 12.5px; color: #555; line-height: 1.65; }
+    .floating-card .card-placeholder { color: #9CA3AF; font-size: 12px; }
+    @keyframes pulse {
+      0% { r: 6; opacity: 0.9; }
+      50% { r: 9; opacity: 0.4; }
+      100% { r: 6; opacity: 0.9; }
+    }
+    .foot-note { font-size: 11px; color: #D1D5DB; text-align: center; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div style="display: flex; align-items: baseline; gap: 14px;">
+      <h1>Career Map</h1>
+      <span class="badge">Project Metro</span>
+    </div>
+    <p class="subtitle">
+      Your career isn't a ladder. It's a journey through a 2D space — toggle paths to explore archetypes, hover zones to understand levels, or draw your own squiggle.
+    </p>
+  </div>
+
+  <div class="toolbar" id="toolbar">
+    <button type="button" id="btn-level-overlay" class="toolbar-btn btn-level-overlay">Show level overlay</button>
+    <div id="path-buttons"></div>
+    <span class="toolbar-divider"></span>
+    <button type="button" id="btn-show-all" class="toolbar-btn">Show all</button>
+    <button type="button" id="btn-draw" class="toolbar-btn btn-draw">Draw my path</button>
+    <button type="button" id="btn-plot" class="toolbar-btn btn-plot">Plot a moment</button>
+    <button type="button" id="btn-clear-dots" class="toolbar-btn" style="display: none;">Clear dots</button>
+    <button type="button" id="btn-clear" class="toolbar-btn" style="display: none;">Clear squiggle</button>
+    <span class="draw-hint" style="font-size: 11px; color: #9CA3AF; margin-left: 8px;">Draw your squiggle — the mess is the point.</span>
+  </div>
+
+  <div class="canvas-wrap">
+    <div id="floating-card" class="floating-card">
+      <div id="level-content" class="card-placeholder">Hover a zone or toggle a path</div>
+    </div>
+    <svg id="map" viewBox="0 0 700 560" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <p class="foot-note" id="foot-note"></p>
+
+  <script>
+(function () {
+  // ─── Canvas geometry ─────────────────────────────────────────────────────
+  const W = 700, H = 560, PL = 148, PR = 28, PT = 36, PB = 100;
+  const PW = W - PL - PR, PH = H - PT - PB;
+
+  function toSVG(nx, ny) {
+    return [PL + nx * PW, PT + ny * PH];
+  }
+
+  function curvePath(pts) {
+    if (!pts || pts.length < 2) return '';
+    const sp = pts.map(([x, y]) => toSVG(x, y));
+    let d = 'M ' + sp[0][0] + ' ' + sp[0][1];
+    for (let i = 1; i < sp.length; i++) {
+      const p = sp[i - 1], c = sp[i];
+      const mx = (p[0] + c[0]) / 2;
+      d += ' C ' + mx + ' ' + p[1] + ', ' + mx + ' ' + c[1] + ', ' + c[0] + ' ' + c[1];
+    }
+    return d;
+  }
+
+  const PSHE_ZONES = [
+    { label: 'Problem',    sub: 'You identify it before anyone else',  y: 0.10, divY: null   },
+    { label: 'Solution',   sub: 'You create the answer',               y: 0.35, divY: 0.235 },
+    { label: 'How to Do',  sub: 'You build the playbook',              y: 0.61, divY: 0.485 },
+    { label: 'Execution',  sub: 'You deliver the work',                y: 0.87, divY: 0.735 },
+  ];
+
+  const LEVEL_BANDS = [
+    { id: 'entry',  label: 'Entry',  color: '#3B82F6', cx: 0.18, cy: 0.84, rx: 0.18, ry: 0.10, tilt: -25,
+      info: "You receive defined work and deliver it well. You're learning the ropes, building reps, and starting to figure out the 'how.' Your world is mostly Execution — and that's exactly right." },
+    { id: 'career', label: 'Career', color: '#10B981', cx: 0.36, cy: 0.63, rx: 0.30, ry: 0.13, tilt: -22,
+      info: "You're systematizing — building playbooks, choosing your direction. You can deepen your execution mastery OR start working your way up into Solutions. Multiple paths are now open." },
+    { id: 'senior', label: 'Senior', color: '#F59E0B', cx: 0.54, cy: 0.40, rx: 0.42, ry: 0.15, tilt: -20,
+      info: "You create solutions, not just follow them. Broad scope. The 'how' is yours to define. Others look to you. You're shaping the work, not just doing it." },
+    { id: 'expert', label: 'Expert', color: '#8B5CF6', cx: 0.60, cy: 0.16, rx: 0.44, ry: 0.14, tilt: -18,
+      headline: 'Two very different looks. Both Expert.',
+      quote: 'When the business wins, I win',
+      info: "The Problem Spotter: broad scope, sees around corners. The Craft Master: narrow but incomparably deep — execution so good no one else can touch it. Both are legitimate. That's the philosophical shift." },
+  ];
+
+  // Arch boundaries (normalized 0–1 coords, y=0 is top) — level overlay when enabled
+  const ARCH_BANDS = [
+    { label: '1', color: '#3B82F6', startY: 0.92, ctrlY: 0.82, endY: 0.70 },
+    { label: '2', color: '#10B981', startY: 0.72, ctrlY: 0.60, endY: 0.46 },
+    { label: '3', color: '#F59E0B', startY: 0.52, ctrlY: 0.38, endY: 0.24 },
+    { label: '4', color: '#8B5CF6', startY: 0.30, ctrlY: 0.16, endY: 0.04 },
+  ];
+
+  const PATHS = [
+    { id: 'ladder',   label: 'Classic Ladder',    color: '#1E293B',
+      pts: [[0.08,0.92],[0.12,0.76],[0.24,0.73],[0.29,0.58],[0.42,0.55],[0.47,0.41],[0.60,0.37],[0.65,0.23],[0.78,0.20],[0.83,0.08],[0.93,0.05]],
+      info: 'PSHE and scope grow together — the traditional path. Gets you to Expert through steady, broad expansion. Most common model, but not the only valid one.' },
+    { id: 'executor', label: 'Execution Machine',  color: '#2563EB',
+      pts: [[0.08,0.91],[0.25,0.90],[0.45,0.90],[0.62,0.89],[0.68,0.62],[0.80,0.58],[0.94,0.55]],
+      info: "Stays at Execution level but expands scope dramatically — then pivots up. \"I'm getting bigger and bigger and I'm an execution machine. But around here... I think I have some ideas.\" A real path to Expert." },
+    { id: 'climber',  label: 'PSHE Climber',     color: '#7C3AED',
+      pts: [[0.10,0.91],[0.13,0.74],[0.15,0.57],[0.17,0.38],[0.19,0.18],[0.21,0.05]],
+      info: "Narrow scope, very high problem ownership. This person climbs the PSHE axis without dramatically widening scope. Becomes the person who identifies problems others haven't named yet." },
+    { id: 'squig',   label: 'The Squiggler',     color: '#DC2626',
+      pts: [[0.09,0.91],[0.20,0.74],[0.14,0.57],[0.28,0.46],[0.42,0.38],[0.36,0.22],[0.52,0.16],[0.70,0.11]],
+      info: 'The honest career path most of us take. Dipping into execution for reps, bouncing through solutions, pivoting, exploring. Sometimes going backward to go forward. Completely valid.' },
+  ];
+
+  // ─── State ───────────────────────────────────────────────────────────────
+  let state = {
+    activeLevelId: null,
+    activePsheId: null,
+    activePathIds: new Set(),
+    showAllPaths: false,
+    showLevelOverlay: false,
+    drawMode: false,
+    plotMode: false,
+    myPts: [],
+    dotPts: [],
+    isDrawing: false,
+    animatedPathIds: new Set(),
+  };
+
+  const svg = document.getElementById('map');
+  const floatingCard = document.getElementById('floating-card');
+  const levelContent = document.getElementById('level-content');
+  const pathButtonsEl = document.getElementById('path-buttons');
+  const btnShowAll = document.getElementById('btn-show-all');
+  const btnDraw = document.getElementById('btn-draw');
+  const btnClear = document.getElementById('btn-clear');
+  const btnLevelOverlay = document.getElementById('btn-level-overlay');
+  const btnPlot = document.getElementById('btn-plot');
+  const btnClearDots = document.getElementById('btn-clear-dots');
+
+  function getNorm(e) {
+    const r = svg.getBoundingClientRect();
+    const sx = (e.clientX - r.left) * (W / r.width);
+    const sy = (e.clientY - r.top) * (H / r.height);
+    return [
+      Math.max(0, Math.min(1, (sx - PL) / PW)),
+      Math.max(0, Math.min(1, (sy - PT) / PH)),
+    ];
+  }
+
+  function render() {
+    // Build SVG content
+    const activeLevel = LEVEL_BANDS.find(l => l.id === state.activeLevelId);
+    const visiblePaths = state.showAllPaths
+      ? PATHS
+      : PATHS.filter(p => state.activePathIds.has(p.id));
+
+    let html = '';
+
+    // Defs: gradients + arrow
+    html += '<defs>';
+    LEVEL_BANDS.forEach(l => {
+      html += '<radialGradient id="grad-' + l.id + '" cx="50%" cy="50%" r="50%">';
+      html += '<stop offset="0%" stop-color="' + l.color + '" stop-opacity="0.14"/>';
+      html += '<stop offset="70%" stop-color="' + l.color + '" stop-opacity="0.05"/>';
+      html += '<stop offset="100%" stop-color="' + l.color + '" stop-opacity="0.01"/>';
+      html += '</radialGradient>';
+    });
+    html += '<marker id="arrowhead" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">';
+    html += '<polygon points="0 0, 8 3, 0 6" fill="#8B8B8B" opacity="0.6"/>';
+    html += '</marker></defs>';
+
+    // Plot area border (defined canvas, level-guide style)
+    html += '<rect x="' + PL + '" y="' + PT + '" width="' + PW + '" height="' + PH + '" fill="none" stroke="#E0E0E0" stroke-width="1"/>';
+
+    // Grid (whisper-thin)
+    [0.25, 0.5, 0.75].forEach(x => {
+      const sx = toSVG(x, 0)[0];
+      html += '<line x1="' + sx + '" y1="' + PT + '" x2="' + sx + '" y2="' + (PT + PH) + '" stroke="#F8F8F8" stroke-width="1"/>';
+    });
+    PSHE_ZONES.filter(p => p.divY != null).forEach(p => {
+      const sy = toSVG(0, p.divY)[1];
+      html += '<line x1="' + PL + '" y1="' + sy + '" x2="' + (PL + PW) + '" y2="' + sy + '" stroke="#F5F5F5" stroke-width="1" stroke-dasharray="6,5"/>';
+    });
+
+    // Level layer: overlay = arch bands (Q curves + filled bands); otherwise = small blobs
+    if (state.showLevelOverlay) {
+      const levelIds = ['entry', 'career', 'senior', 'expert'];
+      ARCH_BANDS.forEach((band, i) => {
+        const [x0, y0] = toSVG(0, band.startY);
+        const [x1, y1] = toSVG(0.5, band.ctrlY);
+        const [x2, y2] = toSVG(1, band.endY);
+        const d = 'M ' + x0 + ' ' + y0 + ' Q ' + x1 + ' ' + y1 + ' ' + x2 + ' ' + y2;
+        const levelId = levelIds[i];
+        const isHov = state.activeLevelId === levelId;
+        const labelX = x2 + 8;
+        const labelY = y2 - 4;
+        html += '<g class="level-blob" data-id="' + levelId + '" style="cursor:pointer">';
+        if (i > 0) {
+          const prev = ARCH_BANDS[i - 1];
+          const [px0, py0] = toSVG(0, prev.startY);
+          const [px1, py1] = toSVG(0.5, prev.ctrlY);
+          const [px2, py2] = toSVG(1, prev.endY);
+          const bandD = d + ' L ' + px2 + ' ' + py2 + ' Q ' + px1 + ' ' + py1 + ' ' + px0 + ' ' + py0 + ' L ' + x0 + ' ' + y0 + ' Z';
+          html += '<path d="' + bandD + '" fill="' + band.color + '" fill-opacity="0.05"/>';
+        }
+        html += '<path d="' + d + '" fill="none" stroke="transparent" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>';
+        html += '<path d="' + d + '" fill="none" stroke="' + band.color + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="' + (isHov ? 0.85 : 0.5) + '"/>';
+        html += '<text x="' + labelX + '" y="' + labelY + '" font-size="11" font-weight="800" fill="' + band.color + '">' + band.label + '</text>';
+        html += '</g>';
+      });
+    } else {
+      LEVEL_BANDS.forEach(l => {
+        const [cx, cy] = toSVG(l.cx, l.cy);
+        const isHov = state.activeLevelId === l.id;
+        const rx = l.rx * PW, ry = l.ry * PH;
+        const labelX = toSVG(Math.min(l.cx + l.rx * 0.72, 0.96), l.cy)[0];
+        const labelY = toSVG(0, l.cy)[1] + 4;
+        html += '<g class="level-blob" data-id="' + l.id + '" style="cursor:pointer">';
+        html += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" ';
+        html += 'fill="url(#grad-' + l.id + ')" fill-opacity="' + (isHov ? 0.2 : 0.14) + '" stroke="' + l.color + '" ';
+        html += 'stroke-width="' + (isHov ? 2.2 : 1) + '" stroke-opacity="' + (isHov ? 0.5 : 0.15) + '" ';
+        html += 'transform="rotate(' + l.tilt + ',' + cx + ',' + cy + ')"/>';
+        html += '<text x="' + labelX + '" y="' + labelY + '" font-size="10.5" font-weight="700" fill="' + l.color + '" text-anchor="middle" opacity="' + (isHov ? 0.9 : 0.65) + '">' + l.label + '</text>';
+        html += '</g>';
+      });
+    }
+
+    // Career path lines (Codrops-style: path draws on when toggled; opacity fade-in)
+    visiblePaths.forEach(path => {
+      const sp = path.pts.map(([x, y]) => toSVG(x, y));
+      const d = curvePath(path.pts);
+      html += '<g class="career-path-g" data-path-id="' + path.id + '" style="opacity:0">';
+      html += '<path d="' + d + '" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity="0.6"/>';
+      html += '<path class="career-path-line" d="' + d + '" fill="none" stroke="' + path.color + '" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>';
+      html += '<circle cx="' + sp[0][0] + '" cy="' + sp[0][1] + '" r="4.5" fill="' + path.color + '" opacity="0.9"/>';
+      html += '<circle cx="' + sp[sp.length - 1][0] + '" cy="' + sp[sp.length - 1][1] + '" r="6" fill="none" stroke="' + path.color + '" stroke-width="2" opacity="0.9"/>';
+      const last = sp[sp.length - 1];
+      html += '<text x="' + (last[0] + 8) + '" y="' + (last[1] - 8) + '" font-size="9.5" fill="' + path.color + '" font-weight="600" opacity="0.8">' + path.label + '</text></g>';
+    });
+
+    // User squiggle
+    if (state.drawMode && state.myPts.length > 1) {
+      html += '<g><path d="' + curvePath(state.myPts) + '" fill="none" stroke="#FF6B35" stroke-width="3" stroke-linecap="round" opacity="0.85"/>';
+      const [x, y] = state.myPts[state.myPts.length - 1];
+      const [sx, sy] = toSVG(x, y);
+      html += '<circle cx="' + sx + '" cy="' + sy + '" r="5.5" fill="#FF6B35" opacity="0.9"/></g>';
+    }
+
+    if (state.drawMode && state.myPts.length === 0) {
+      html += '<text x="' + (PL + PW / 2) + '" y="' + (PT + PH / 2) + '" font-size="14" fill="#B0B0B0" text-anchor="middle">Click and drag to draw your squiggle</text>';
+    }
+
+    // Plot dots (moments)
+    state.dotPts.forEach(([nx, ny]) => {
+      const [sx, sy] = toSVG(nx, ny);
+      html += '<circle cx="' + sx + '" cy="' + sy + '" r="6" fill="#F59E0B" opacity="0.9" class="moment-dot">';
+      html += '<animate attributeName="r" values="6;9;6" dur="1.5s" repeatCount="indefinite"/>';
+      html += '<animate attributeName="opacity" values="0.9;0.4;0.9" dur="1.5s" repeatCount="indefinite"/>';
+      html += '</circle>';
+    });
+
+    // Y-axis line
+    html += '<line x1="' + PL + '" y1="' + PT + '" x2="' + PL + '" y2="' + (PT + PH + 18) + '" stroke="#8B8B8B" stroke-width="1.8" marker-end="url(#arrowhead)"/>';
+
+    // Y-axis labels (hoverable — sub-label only for hovered zone)
+    const labelX = PL - 14;
+    PSHE_ZONES.forEach(p => {
+      const sy = toSVG(0, p.y)[1];
+      const pid = p.label.replace(/\s+/g, '-').toLowerCase();
+      const isPsheHov = state.activePsheId === pid;
+      html += '<g class="pshe-label" data-pshe-id="' + pid + '" style="cursor:pointer">';
+      html += '<text x="' + labelX + '" y="' + (sy - 3) + '" font-size="12" fill="#444" text-anchor="end" font-weight="800">' + p.label + '</text>';
+      if (isPsheHov) {
+        html += '<text x="' + labelX + '" y="' + (sy + 11) + '" font-size="9" fill="#AAAAAA" text-anchor="end">' + p.sub + '</text>';
+      }
+      html += '<line x1="' + (PL - 4) + '" y1="' + sy + '" x2="' + PL + '" y2="' + sy + '" stroke="#999" stroke-width="1"/></g>';
+    });
+
+    // Expert callout when Expert blob is hovered
+    if (state.activeLevelId === 'expert') {
+      const expertBand = LEVEL_BANDS.find(l => l.id === 'expert');
+      const [leftX, leftY] = toSVG(expertBand.cx - expertBand.rx * 0.85, expertBand.cy);
+      const [rightX, rightY] = toSVG(expertBand.cx + expertBand.rx * 0.85, expertBand.cy);
+      html += '<text x="' + leftX + '" y="' + (leftY + 4) + '" font-size="10" font-weight="700" fill="#8B5CF6" opacity="0.7">Craft Expert</text>';
+      html += '<text x="' + rightX + '" y="' + (rightY + 4) + '" font-size="10" font-weight="700" fill="#8B5CF6" opacity="0.7" text-anchor="end">Problem Expert</text>';
+    }
+
+    // X-axis: arrow + main label 28px below + Narrow / Broad cues
+    const xAxisY = PT + PH;
+    html += '<line x1="' + PL + '" y1="' + xAxisY + '" x2="' + (PL + PW) + '" y2="' + xAxisY + '" stroke="#6B6B6B" stroke-width="2" marker-end="url(#arrowhead)"/>';
+    html += '<text x="' + (PL + PW / 2) + '" y="' + (xAxisY + 28) + '" font-size="11" fill="#6B7280" font-weight="500" text-anchor="middle">Complexity · Scope · # of Directs · Ambiguity</text>';
+    html += '<text x="' + PL + '" y="' + (xAxisY + 28) + '" font-size="10" fill="#C4C4C4" font-weight="600" text-anchor="start">← Narrow</text>';
+    html += '<text x="' + (PL + PW) + '" y="' + (xAxisY + 28) + '" font-size="10" fill="#C4C4C4" font-weight="600" text-anchor="end">Broad →</text>';
+
+    svg.innerHTML = html;
+
+    // Path draw animation (Codrops / Josh Comeau style: path draws onto map)
+    var toRemove = [];
+    state.animatedPathIds.forEach(function(id) {
+      if (!visiblePaths.some(function(p) { return p.id === id; })) toRemove.push(id);
+    });
+    toRemove.forEach(function(id) { state.animatedPathIds.delete(id); });
+    svg.querySelectorAll('.career-path-line').forEach(function(p) {
+      const g = p.closest('.career-path-g');
+      const id = g.getAttribute('data-path-id');
+      if (!state.animatedPathIds.has(id)) {
+        var len = p.getTotalLength();
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+        state.animatedPathIds.add(id);
+        requestAnimationFrame(function() {
+          p.style.transition = 'stroke-dashoffset 0.7s ease-out';
+          p.style.strokeDashoffset = '0';
+          g.style.transition = 'opacity 0.2s ease-out';
+          g.style.opacity = '1';
+        });
+      } else {
+        g.style.opacity = '1';
+      }
+    });
+
+    // Re-attach blob hover
+    svg.querySelectorAll('.level-blob').forEach(g => {
+      const id = g.getAttribute('data-id');
+      g.addEventListener('mouseenter', () => { state.activeLevelId = id; updateFloatingCard(); render(); });
+      g.addEventListener('mouseleave', () => { state.activeLevelId = null; updateFloatingCard(); render(); });
+    });
+
+    // Y-axis label hover
+    svg.querySelectorAll('.pshe-label').forEach(g => {
+      const pid = g.getAttribute('data-pshe-id');
+      g.addEventListener('mouseenter', () => { state.activePsheId = pid; updateFloatingCard(); render(); });
+      g.addEventListener('mouseleave', () => { state.activePsheId = null; updateFloatingCard(); render(); });
+    });
+
+    // Floating card: level hover wins, then pshe hover, then active path description
+    updateFloatingCard();
+
+    // Path buttons (toolbar style)
+    pathButtonsEl.innerHTML = PATHS.map(p => {
+      const active = state.activePathIds.has(p.id) || state.showAllPaths;
+      return '<button type="button" class="toolbar-btn path-btn' + (active ? ' active' : '') + '" data-id="' + p.id + '" style="--path-color:' + p.color + '">' +
+        '<span class="path-btn-dot"></span>' + p.label + '</button>';
+    }).join('');
+    pathButtonsEl.querySelectorAll('.path-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (state.showAllPaths) { state.showAllPaths = false; state.activePathIds = new Set(); }
+        const id = btn.getAttribute('data-id');
+        if (state.activePathIds.has(id)) state.activePathIds.delete(id);
+        else state.activePathIds.add(id);
+        state.drawMode = false;
+        state.plotMode = false;
+        state.myPts = [];
+        updateDrawUI();
+        render();
+      });
+    });
+
+    btnShowAll.textContent = state.showAllPaths ? 'Hide all' : 'Show all';
+    btnShowAll.classList.toggle('on', state.showAllPaths);
+    btnLevelOverlay.textContent = state.showLevelOverlay ? 'Hide level overlay' : 'Show level overlay';
+    btnLevelOverlay.classList.toggle('active', state.showLevelOverlay);
+  }
+
+  function updateFloatingCard() {
+    const activeLevel = LEVEL_BANDS.find(l => l.id === state.activeLevelId);
+    const activePshe = state.activePsheId ? PSHE_ZONES.find(z => z.label.replace(/\s+/g, '-').toLowerCase() === state.activePsheId) : null;
+    const visiblePaths = state.showAllPaths ? PATHS : PATHS.filter(p => state.activePathIds.has(p.id));
+    const singlePathActive = !activeLevel && !activePshe && visiblePaths.length === 1 ? visiblePaths[0] : null;
+
+    if (activeLevel) {
+      floatingCard.classList.add('visible');
+      floatingCard.style.borderLeftColor = activeLevel.color;
+      if (activeLevel.id === 'expert' && activeLevel.headline && activeLevel.quote) {
+        levelContent.innerHTML = '<div class="card-title" style="color:' + activeLevel.color + '">' + activeLevel.label + '</div>' +
+          '<div class="card-body" style="font-weight:700;margin-bottom:8px;">' + activeLevel.headline + '</div>' +
+          '<div class="card-body" style="font-style:italic;margin-bottom:8px;color:#666;">' + activeLevel.quote + '</div>' +
+          '<div class="card-body">' + activeLevel.info + '</div>';
+      } else {
+        levelContent.innerHTML = '<div class="card-title" style="color:' + activeLevel.color + '">' + activeLevel.label + '</div><div class="card-body">' + activeLevel.info + '</div>';
+      }
+    } else if (activePshe) {
+      floatingCard.classList.add('visible');
+      floatingCard.style.borderLeftColor = '#8B5CF6';
+      levelContent.innerHTML = '<div class="card-title" style="color:#374151">' + activePshe.label + '</div><div class="card-body">' + activePshe.sub + '</div>';
+    } else if (singlePathActive) {
+      floatingCard.classList.add('visible');
+      floatingCard.style.borderLeftColor = singlePathActive.color;
+      levelContent.innerHTML = '<div class="card-title" style="color:' + singlePathActive.color + '">' + singlePathActive.label + '</div><div class="card-body">' + singlePathActive.info + '</div>';
+    } else {
+      floatingCard.classList.remove('visible');
+      floatingCard.style.borderLeftColor = '';
+      levelContent.innerHTML = '<span class="card-placeholder">Hover a zone or toggle a path</span>';
+    }
+  }
+
+  btnShowAll.addEventListener('click', () => {
+    state.showAllPaths = !state.showAllPaths;
+    if (state.showAllPaths) state.activePathIds = new Set(PATHS.map(p => p.id));
+    else state.activePathIds = new Set();
+    state.drawMode = false;
+    state.plotMode = false;
+    state.myPts = [];
+    updateDrawUI();
+    render();
+  });
+
+  btnLevelOverlay.addEventListener('click', () => {
+    state.showLevelOverlay = !state.showLevelOverlay;
+    render();
+  });
+
+  function updateDrawUI() {
+    svg.classList.toggle('draw-mode', state.drawMode);
+    svg.classList.toggle('plot-mode', state.plotMode);
+    btnDraw.textContent = state.drawMode ? 'Stop Drawing' : 'Draw my path';
+    btnDraw.classList.toggle('active', state.drawMode);
+    btnClear.style.display = state.myPts.length > 1 ? 'inline-block' : 'none';
+    btnClearDots.style.display = state.dotPts.length > 0 ? 'inline-block' : 'none';
+    btnPlot.classList.toggle('active', state.plotMode);
+  }
+
+  btnDraw.addEventListener('click', () => {
+    state.drawMode = !state.drawMode;
+    if (!state.drawMode) state.myPts = [];
+    state.plotMode = false;
+    state.activePathIds = new Set();
+    state.showAllPaths = false;
+    updateDrawUI();
+    render();
+  });
+
+  btnClear.addEventListener('click', () => {
+    state.myPts = [];
+    updateDrawUI();
+    render();
+  });
+
+  btnPlot.addEventListener('click', () => {
+    state.plotMode = !state.plotMode;
+    state.drawMode = false;
+    state.myPts = [];
+    updateDrawUI();
+    render();
+  });
+
+  btnClearDots.addEventListener('click', () => {
+    state.dotPts = [];
+    updateDrawUI();
+    render();
+  });
+
+  svg.addEventListener('mousedown', e => {
+    if (state.plotMode) {
+      const pt = getNorm(e);
+      if (pt[0] >= 0 && pt[0] <= 1 && pt[1] >= 0 && pt[1] <= 1) {
+        state.dotPts = state.dotPts.concat([pt]);
+        updateDrawUI();
+        render();
+      }
+      return;
+    }
+    if (!state.drawMode) return;
+    state.isDrawing = true;
+    state.myPts = [getNorm(e)];
+    updateDrawUI();
+    render();
+  });
+
+  svg.addEventListener('mousemove', e => {
+    if (!state.drawMode || !state.isDrawing) return;
+    const pt = getNorm(e);
+    const last = state.myPts[state.myPts.length - 1];
+    if (Math.hypot(pt[0] - last[0], pt[1] - last[1]) > 0.012) {
+      state.myPts = state.myPts.concat([pt]);
+      render();
+    }
+  });
+
+  svg.addEventListener('mouseup', () => { state.isDrawing = false; });
+  svg.addEventListener('mouseleave', () => { state.isDrawing = false; });
+
+  document.getElementById('foot-note').textContent = "Project Metro · from Leah's whiteboard · " + new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  render();
+})();
+  </script>
+</body>
+</html>
