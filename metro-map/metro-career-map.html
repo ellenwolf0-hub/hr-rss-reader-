@@ -36,7 +36,6 @@
       cursor: pointer; transition: all 0.2s ease; font-family: 'Inter', sans-serif;
     }
     .toolbar-btn:hover { background: #F2F0EB; }
-    #btn-show-all.on { color: #554DCB; }
     .toolbar-btn.path-btn.active {
       background: color-mix(in srgb, var(--path-color) 15%, transparent);
       color: var(--path-color); border: 1.5px solid var(--path-color);
@@ -84,7 +83,7 @@
       <span class="badge">Project Metro</span>
     </div>
     <p class="subtitle">
-      Your career isn't a ladder. It's a journey through a 2D space — toggle paths to explore archetypes, hover zones to understand levels, or draw your own squiggle.
+      There are different ways to grow — and you can have high impact in any of them. Toggle a path to explore an archetype, turn on the level overlay to see where you might be, or draw your own squiggle.
     </p>
   </div>
 
@@ -92,12 +91,13 @@
     <button type="button" id="btn-level-overlay" class="toolbar-btn btn-level-overlay">Show level overlay</button>
     <div id="path-buttons"></div>
     <span class="toolbar-divider"></span>
-    <button type="button" id="btn-show-all" class="toolbar-btn">Show all</button>
+    <button type="button" id="btn-show-examples" class="toolbar-btn btn-show-examples">Show examples</button>
     <button type="button" id="btn-draw" class="toolbar-btn btn-draw">Draw my path</button>
     <button type="button" id="btn-plot" class="toolbar-btn btn-plot">Plot a moment</button>
     <button type="button" id="btn-clear-dots" class="toolbar-btn" style="display: none;">Clear dots</button>
     <button type="button" id="btn-clear" class="toolbar-btn" style="display: none;">Clear squiggle</button>
     <span class="draw-hint" style="font-size: 11px; color: #8F8C88; margin-left: 8px;">Draw your squiggle — the mess is the point.</span>
+    <button type="button" id="btn-reset" class="toolbar-btn btn-reset" style="margin-left: auto; color: #8F8C88;">Reset</button>
   </div>
 
   <div class="canvas-wrap">
@@ -223,28 +223,29 @@
   let state = {
     activeLevelId: null,
     activePsheId: null,
-    activeExampleDotId: null,
     activePathIds: new Set(),
-    showAllPaths: false,
     showLevelOverlay: false,
     drawMode: false,
     plotMode: false,
+    showExamples: false,
     myPts: [],
     dotPts: [],
     isDrawing: false,
     animatedPathIds: new Set(),
+    activeExampleDotId: null,
   };
 
   const svg = document.getElementById('map');
   const floatingCard = document.getElementById('floating-card');
   const levelContent = document.getElementById('level-content');
   const pathButtonsEl = document.getElementById('path-buttons');
-  const btnShowAll = document.getElementById('btn-show-all');
   const btnDraw = document.getElementById('btn-draw');
   const btnClear = document.getElementById('btn-clear');
   const btnLevelOverlay = document.getElementById('btn-level-overlay');
+  const btnShowExamples = document.getElementById('btn-show-examples');
   const btnPlot = document.getElementById('btn-plot');
   const btnClearDots = document.getElementById('btn-clear-dots');
+  const btnReset = document.getElementById('btn-reset');
 
   function getNorm(e) {
     const r = svg.getBoundingClientRect();
@@ -259,9 +260,7 @@
   function render() {
     // Build SVG content
     const activeLevel = LEVEL_BANDS.find(l => l.id === state.activeLevelId);
-    const visiblePaths = state.showAllPaths
-      ? PATHS
-      : PATHS.filter(p => state.activePathIds.has(p.id));
+    const visiblePaths = PATHS.filter(p => state.activePathIds.has(p.id));
 
     let html = '';
 
@@ -356,7 +355,7 @@
     }
 
     if (state.drawMode && state.myPts.length === 0) {
-      html += '<text x="' + (PL + PW / 2) + '" y="' + (PT + PH / 2) + '" font-family="Inter, sans-serif" font-size="14" fill="' + COLORS.textMuted + '" text-anchor="middle">Click and drag to draw your squiggle</text>';
+      html += '<text x="' + (PL + PW / 2) + '" y="' + (PT + PH / 2) + '" font-family="Inter, sans-serif" font-size="13" font-weight="400" fill="' + COLORS.textMuted + '" text-anchor="middle">Click and drag to draw your path</text>';
     }
 
     // Plot dots (moments)
@@ -368,7 +367,8 @@
       html += '</circle>';
     });
 
-    // Example dots (labeled role examples)
+    // Example dots (labeled role examples) — only when showExamples is on
+    if (state.showExamples) {
     EXAMPLE_DOTS.forEach(dot => {
       const [sx, sy] = toSVG(dot.nx, dot.ny);
       const isActive = state.activeExampleDotId === dot.id;
@@ -377,6 +377,7 @@
       html += '<text x="' + (sx + 11) + '" y="' + (sy + 4) + '" font-family="Inter, sans-serif" font-size="9.5" fill="' + dot.color + '" font-weight="600" opacity="0.85">' + dot.label + '</text>';
       html += '</g>';
     });
+    }
 
     // Y-axis line
     html += '<line x1="' + PL + '" y1="' + PT + '" x2="' + PL + '" y2="' + (PT + PH + 18) + '" stroke="' + COLORS.textFaint + '" stroke-width="1.8" marker-end="url(#arrowhead)"/>';
@@ -479,18 +480,20 @@
 
     updateFloatingCard();
 
-    // Path buttons (toolbar style)
+    // Path buttons (toolbar style) — one path at a time
     pathButtonsEl.innerHTML = PATHS.map(p => {
-      const active = state.activePathIds.has(p.id) || state.showAllPaths;
+      const active = state.activePathIds.has(p.id);
       return '<button type="button" class="toolbar-btn path-btn' + (active ? ' active' : '') + '" data-id="' + p.id + '" style="--path-color:' + p.color + '">' +
         '<span class="path-btn-dot"></span>' + p.label + '</button>';
     }).join('');
     pathButtonsEl.querySelectorAll('.path-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        if (state.showAllPaths) { state.showAllPaths = false; state.activePathIds = new Set(); }
         const id = btn.getAttribute('data-id');
-        if (state.activePathIds.has(id)) state.activePathIds.delete(id);
-        else state.activePathIds.add(id);
+        if (state.activePathIds.has(id)) {
+          state.activePathIds = new Set();
+        } else {
+          state.activePathIds = new Set([id]);
+        }
         state.drawMode = false;
         state.plotMode = false;
         state.myPts = [];
@@ -499,17 +502,17 @@
       });
     });
 
-    btnShowAll.textContent = state.showAllPaths ? 'Hide all' : 'Show all';
-    btnShowAll.classList.toggle('on', state.showAllPaths);
     btnLevelOverlay.textContent = state.showLevelOverlay ? 'Hide level overlay' : 'Show level overlay';
     btnLevelOverlay.classList.toggle('active', state.showLevelOverlay);
+    btnShowExamples.textContent = state.showExamples ? 'Hide examples' : 'Show examples';
+    btnShowExamples.classList.toggle('active', state.showExamples);
   }
 
   function updateFloatingCard() {
     const activeDot = state.activeExampleDotId ? EXAMPLE_DOTS.find(d => d.id === state.activeExampleDotId) : null;
     const activeLevel = LEVEL_BANDS.find(l => l.id === state.activeLevelId);
     const activePshe = state.activePsheId ? PSHE_ZONES.find(z => z.label.replace(/\s+/g, '-').toLowerCase() === state.activePsheId) : null;
-    const visiblePaths = state.showAllPaths ? PATHS : PATHS.filter(p => state.activePathIds.has(p.id));
+    const visiblePaths = PATHS.filter(p => state.activePathIds.has(p.id));
     const singlePathActive = !activeDot && !activeLevel && !activePshe && visiblePaths.length === 1 ? visiblePaths[0] : null;
 
     if (activeDot) {
@@ -537,19 +540,30 @@
     }
   }
 
-  btnShowAll.addEventListener('click', () => {
-    state.showAllPaths = !state.showAllPaths;
-    if (state.showAllPaths) state.activePathIds = new Set(PATHS.map(p => p.id));
-    else state.activePathIds = new Set();
-    state.drawMode = false;
-    state.plotMode = false;
-    state.myPts = [];
-    updateDrawUI();
+  btnLevelOverlay.addEventListener('click', () => {
+    state.showLevelOverlay = !state.showLevelOverlay;
     render();
   });
 
-  btnLevelOverlay.addEventListener('click', () => {
-    state.showLevelOverlay = !state.showLevelOverlay;
+  btnShowExamples.addEventListener('click', () => {
+    state.showExamples = !state.showExamples;
+    render();
+  });
+
+  btnReset.addEventListener('click', () => {
+    state.activeLevelId = null;
+    state.activePsheId = null;
+    state.activePathIds = new Set();
+    state.showLevelOverlay = false;
+    state.drawMode = false;
+    state.plotMode = false;
+    state.showExamples = false;
+    state.myPts = [];
+    state.dotPts = [];
+    state.isDrawing = false;
+    state.animatedPathIds = new Set();
+    state.activeExampleDotId = null;
+    updateDrawUI();
     render();
   });
 
@@ -567,8 +581,6 @@
     state.drawMode = !state.drawMode;
     if (!state.drawMode) state.myPts = [];
     state.plotMode = false;
-    state.activePathIds = new Set();
-    state.showAllPaths = false;
     updateDrawUI();
     render();
   });
