@@ -4,48 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Career Map</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <style>
-    /* SuperSans & SuperSerif — place .otf files in metro-map/fonts/ */
-    @font-face {
-      font-family: 'SuperSans';
-      src: url('fonts/SuperSans-Regular.otf') format('opentype');
-      font-weight: 400; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: 'SuperSans';
-      src: url('fonts/SuperSans-Medium.otf') format('opentype');
-      font-weight: 500; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: 'SuperSans';
-      src: url('fonts/SuperSans-SemiBold.otf') format('opentype');
-      font-weight: 600; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: 'SuperSans';
-      src: url('fonts/SuperSans-Bold.otf') format('opentype');
-      font-weight: 700; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: 'SuperSerif';
-      src: url('fonts/SuperSerif-Light.otf') format('opentype');
-      font-weight: 300; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: 'SuperSerif';
-      src: url('fonts/SuperSerif-Regular.otf') format('opentype');
-      font-weight: 400; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: 'SuperSerif';
-      src: url('fonts/SuperSerif-Medium.otf') format('opentype');
-      font-weight: 500; font-style: normal; font-display: swap;
-    }
-
     * { box-sizing: border-box; }
     body {
-      font-family: 'SuperSans', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 14px;
       background: #FCFAF7;
       min-height: 100vh;
@@ -55,14 +18,14 @@
       margin-left: auto;
       margin-right: auto;
     }
-    h1 { font-family: 'SuperSerif', serif; font-size: 24px; font-weight: 300; letter-spacing: -0.8px; color: #141413; margin: 0 0 6px 0; }
+    h1 { font-family: 'DM Serif Display', serif; font-size: 24px; font-weight: 300; letter-spacing: -0.8px; color: #141413; margin: 0 0 6px 0; }
     .badge {
-      font-family: 'SuperSans', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 11px; font-weight: 600; background: #E6E4FF; color: #554DCB;
       padding: 3px 9px; border-radius: 99px; letter-spacing: 0.3px;
       display: inline-block; margin-left: 14px;
     }
-    .subtitle { font-family: 'SuperSans', sans-serif; font-weight: 400; color: #8F8C88; margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; }
+    .subtitle { font-family: 'Inter', sans-serif; font-weight: 400; color: #8F8C88; margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; }
     .toolbar {
       display: flex; gap: 10px; align-items: center; padding: 12px 0;
       flex-wrap: wrap; border-bottom: 1px solid #F2F0EB; margin-bottom: 16px;
@@ -70,7 +33,7 @@
     .toolbar-btn {
       background: #FFFFFF; border: 1px solid #DEDBD5; border-radius: 8px;
       padding: 6px 12px; font-size: 13px; font-weight: 600; color: #141413;
-      cursor: pointer; transition: all 0.2s ease; font-family: 'SuperSans', sans-serif;
+      cursor: pointer; transition: all 0.2s ease; font-family: 'Inter', sans-serif;
     }
     .toolbar-btn:hover { background: #F2F0EB; }
     #btn-show-all.on { color: #554DCB; }
@@ -94,16 +57,15 @@
     #map.draw-mode { cursor: crosshair; }
     #map.plot-mode { cursor: crosshair; }
     .floating-card {
-      position: absolute; top: 16px; right: 16px; width: 220px;
-      background: #fff; border-radius: 10px; padding: 16px;
+      position: static; width: 100%; margin-top: 16px;
+      min-height: 72px; background: #fff; border-radius: 10px; padding: 16px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-      font-size: 13px; line-height: 1.5; opacity: 0;
+      font-size: 13px; line-height: 1.5;
       border-left: 3px solid #554DCB;
-      transition: opacity 0.15s ease; pointer-events: none;
+      text-align: left; font-family: 'Inter', sans-serif;
     }
-    .floating-card.visible { opacity: 1; pointer-events: auto; }
-    .floating-card { font-family: 'SuperSans', sans-serif; }
-    .floating-card .card-title { font-weight: 600; font-family: 'SuperSans', sans-serif; font-size: 14px; margin-bottom: 8px; }
+    .floating-card .card-placeholder { font-style: italic; }
+    .floating-card .card-title { font-weight: 600; font-family: 'Inter', sans-serif; font-size: 14px; margin-bottom: 8px; }
     .floating-card .card-body { font-size: 12.5px; color: #474543; line-height: 1.65; }
     .floating-card .card-placeholder { color: #8F8C88; font-size: 12px; }
     @keyframes pulse {
@@ -111,8 +73,8 @@
       50% { r: 9; opacity: 0.4; }
       100% { r: 6; opacity: 0.9; }
     }
-    .draw-hint { font-family: 'SuperSans', sans-serif; }
-    .foot-note { font-family: 'SuperSans', sans-serif; font-size: 11px; color: #BFBCB6; text-align: center; margin-top: 20px; }
+    .draw-hint { font-family: 'Inter', sans-serif; }
+    .foot-note { font-family: 'Inter', sans-serif; font-size: 11px; color: #BFBCB6; text-align: center; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -139,10 +101,11 @@
   </div>
 
   <div class="canvas-wrap">
-    <div id="floating-card" class="floating-card">
-      <div id="level-content" class="card-placeholder">Hover a zone or toggle a path</div>
-    </div>
     <svg id="map" viewBox="0 0 700 560" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div id="floating-card" class="floating-card">
+    <div id="level-content" class="card-placeholder">Click a level zone or career stage to learn more.</div>
   </div>
 
   <p class="foot-note" id="foot-note"></p>
@@ -191,23 +154,31 @@
   }
 
   const PSHE_ZONES = [
-    { label: 'Problem',    sub: 'You identify it before anyone else',  y: 0.10, divY: null   },
-    { label: 'Solution',   sub: 'You create the answer',               y: 0.35, divY: 0.235 },
-    { label: 'How to Do',  sub: 'You build the playbook',              y: 0.61, divY: 0.485 },
-    { label: 'Execution',  sub: 'You deliver the work',                y: 0.87, divY: 0.735 },
+    { label: 'Problem', sub: 'You identify it before anyone else',
+      desc: 'You are given a space — an area of focus — and your job is to identify the problems that matter within it. No one handed you the question. You found it. This is the rarest skill: creating clarity out of ambiguity before anyone else sees there\'s a problem at all.',
+      y: 0.10, divY: null },
+    { label: 'Solution', sub: 'You create the answer',
+      desc: 'You are given the problem and must come up with the solution and the path to get there. You translate a defined challenge into a concrete answer. Experience and judgment are your tools — the "how" is yours to design.',
+      y: 0.35, divY: 0.235 },
+    { label: 'How', sub: 'You build the playbook',
+      desc: 'You are given the problem and the solution — your job is to figure out how to execute it. You build the process, the system, the playbook. You turn a good idea into a repeatable, scalable plan others can follow.',
+      y: 0.61, divY: 0.485 },
+    { label: 'Execution', sub: 'You deliver the work',
+      desc: 'You are handed the problem, the solution, and the how — your job is to execute with excellence. This is not a lesser skill. The deepest execution experts — people who deliver with extraordinary craft and consistency at high complexity — are irreplaceable.',
+      y: 0.87, divY: 0.735 },
   ];
 
   const LEVEL_BANDS = [
     { id: 'entry',  label: 'Entry',  color: COLORS.myst30, cx: 0.18, cy: 0.84, rx: 0.18, ry: 0.10, tilt: -25,
-      info: "You receive defined work and deliver it well. You're learning the ropes, building reps, and starting to figure out the 'how.' Your world is mostly Execution — and that's exactly right." },
+      info: "You receive clearly defined work and deliver it well. You're building reps, learning the craft, and figuring out the how. Your world is mostly Execution — and that's exactly right. Everyone starts here." },
     { id: 'career', label: 'Career', color: COLORS.myst40, cx: 0.36, cy: 0.63, rx: 0.30, ry: 0.13, tilt: -22,
-      info: "You're systematizing — building playbooks, choosing your direction. You can deepen your execution mastery OR start working your way up into Solutions. Multiple paths are now open." },
+      info: "You're starting to own the playbook, not just follow it. You can deepen your execution mastery OR start working your way into Solutions. The path is forking — this is where intentional choices start to matter." },
     { id: 'senior', label: 'Senior', color: COLORS.myst60, cx: 0.54, cy: 0.40, rx: 0.42, ry: 0.15, tilt: -20,
-      info: "You create solutions, not just follow them. Broad scope. The 'how' is yours to define. Others look to you. You're shaping the work, not just doing it." },
+      info: "You define the solution, not just execute it. Others look to you. Broad scope, high ownership — you're shaping work, not just doing it. The 'how' is yours to invent." },
     { id: 'expert', label: 'Expert', color: COLORS.heart80, cx: 0.60, cy: 0.16, rx: 0.44, ry: 0.14, tilt: -18,
       headline: 'Two very different looks. Both Expert.',
-      quote: 'When the business wins, I win',
-      info: "The Problem Spotter: broad scope, sees around corners. The Craft Master: narrow but incomparably deep — execution so good no one else can touch it. Both are legitimate. That's the philosophical shift." },
+      quote: 'When the business wins, I win.',
+      info: "The Craft Master: narrow scope, but execution so deep and consistent no one else can touch it. The Problem Spotter: broad scope, sees around corners, names problems before others know they exist. Both are valid Expert paths. That's the whole point of this map." },
   ];
 
   // Arch boundaries (normalized 0–1 coords, y=0 is top) — level overlay when enabled
@@ -233,10 +204,26 @@
       info: 'The honest career path most of us take. Dipping into execution for reps, bouncing through solutions, pivoting, exploring. Sometimes going backward to go forward. Completely valid.' },
   ];
 
+  const EXAMPLE_DOTS = [
+    { id: 'cx-expert', label: 'Senior CX Specialist', nx: 0.82, ny: 0.83, color: COLORS.myst40,
+      title: 'Senior CX Specialist',
+      desc: 'Stays in Execution — but goes extraordinarily deep. High complexity, high craft. This person knows the product, the customer, and the failure modes better than almost anyone. Impact through mastery, not hierarchy.' },
+    { id: 'staff-eng', label: 'Staff Engineer', nx: 0.88, ny: 0.55, color: COLORS.myst60,
+      title: 'Staff Engineer',
+      desc: 'High execution craft at very broad scope. Defines how engineering gets done across teams. The playbook is theirs. A Craft Expert on the path to or at Expert level.' },
+    { id: 'dir-product', label: 'Director of Product', nx: 0.78, ny: 0.12, color: COLORS.heart60,
+      title: 'Director of Product',
+      desc: 'Broad scope, high problem ownership. Identifies the problems the business doesn\'t know it has yet. Creates clarity out of ambiguity. A Problem Expert — sees around corners.' },
+    { id: 'assoc-pm', label: 'Associate PM', nx: 0.15, ny: 0.88, color: COLORS.textMuted,
+      title: 'Associate PM',
+      desc: 'Early in the journey. Receiving well-defined work and delivering it with care. Building reps, learning the craft. The whole map is ahead.' },
+  ];
+
   // ─── State ───────────────────────────────────────────────────────────────
   let state = {
     activeLevelId: null,
     activePsheId: null,
+    activeExampleDotId: null,
     activePathIds: new Set(),
     showAllPaths: false,
     showLevelOverlay: false,
@@ -327,7 +314,7 @@
         }
         html += '<path d="' + d + '" fill="none" stroke="transparent" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>';
         html += '<path d="' + d + '" fill="none" stroke="' + band.color + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="' + (isHov ? 0.85 : 0.5) + '"/>';
-        html += '<text x="' + labelX + '" y="' + labelY + '" font-family="SuperSans, sans-serif" font-size="11" font-weight="800" fill="' + band.color + '">' + band.label + '</text>';
+        html += '<text x="' + labelX + '" y="' + labelY + '" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="' + band.color + '">' + band.label + '</text>';
         html += '</g>';
       });
     } else {
@@ -342,7 +329,7 @@
         html += 'fill="url(#grad-' + l.id + ')" fill-opacity="' + (isHov ? 0.2 : 0.14) + '" stroke="' + l.color + '" ';
         html += 'stroke-width="' + (isHov ? 2.2 : 1) + '" stroke-opacity="' + (isHov ? 0.5 : 0.15) + '" ';
         html += 'transform="rotate(' + l.tilt + ',' + cx + ',' + cy + ')"/>';
-        html += '<text x="' + labelX + '" y="' + labelY + '" font-family="SuperSans, sans-serif" font-size="10.5" font-weight="700" fill="' + l.color + '" text-anchor="middle" opacity="' + (isHov ? 0.9 : 0.65) + '">' + l.label + '</text>';
+        html += '<text x="' + labelX + '" y="' + labelY + '" font-family="Inter, sans-serif" font-size="10.5" font-weight="700" fill="' + l.color + '" text-anchor="middle" opacity="' + (isHov ? 0.9 : 0.65) + '">' + l.label + '</text>';
         html += '</g>';
       });
     }
@@ -357,7 +344,7 @@
       html += '<circle cx="' + sp[0][0] + '" cy="' + sp[0][1] + '" r="4.5" fill="' + path.color + '" opacity="0.9"/>';
       html += '<circle cx="' + sp[sp.length - 1][0] + '" cy="' + sp[sp.length - 1][1] + '" r="6" fill="none" stroke="' + path.color + '" stroke-width="2" opacity="0.9"/>';
       const last = sp[sp.length - 1];
-      html += '<text x="' + (last[0] + 8) + '" y="' + (last[1] - 8) + '" font-family="SuperSans, sans-serif" font-size="9.5" fill="' + path.color + '" font-weight="600" opacity="0.8">' + path.label + '</text></g>';
+      html += '<text x="' + (last[0] + 8) + '" y="' + (last[1] - 8) + '" font-family="Inter, sans-serif" font-size="9.5" fill="' + path.color + '" font-weight="600" opacity="0.8">' + path.label + '</text></g>';
     });
 
     // User squiggle
@@ -369,7 +356,7 @@
     }
 
     if (state.drawMode && state.myPts.length === 0) {
-      html += '<text x="' + (PL + PW / 2) + '" y="' + (PT + PH / 2) + '" font-family="SuperSans, sans-serif" font-size="14" fill="' + COLORS.textMuted + '" text-anchor="middle">Click and drag to draw your squiggle</text>';
+      html += '<text x="' + (PL + PW / 2) + '" y="' + (PT + PH / 2) + '" font-family="Inter, sans-serif" font-size="14" fill="' + COLORS.textMuted + '" text-anchor="middle">Click and drag to draw your squiggle</text>';
     }
 
     // Plot dots (moments)
@@ -379,6 +366,16 @@
       html += '<animate attributeName="r" values="6;9;6" dur="1.5s" repeatCount="indefinite"/>';
       html += '<animate attributeName="opacity" values="0.9;0.4;0.9" dur="1.5s" repeatCount="indefinite"/>';
       html += '</circle>';
+    });
+
+    // Example dots (labeled role examples)
+    EXAMPLE_DOTS.forEach(dot => {
+      const [sx, sy] = toSVG(dot.nx, dot.ny);
+      const isActive = state.activeExampleDotId === dot.id;
+      html += '<g class="example-dot-g" data-dot-id="' + dot.id + '" style="cursor:pointer">';
+      html += '<circle cx="' + sx + '" cy="' + sy + '" r="' + (isActive ? 9 : 7) + '" fill="' + dot.color + '" opacity="0.9" stroke="#fff" stroke-width="2"/>';
+      html += '<text x="' + (sx + 11) + '" y="' + (sy + 4) + '" font-family="Inter, sans-serif" font-size="9.5" fill="' + dot.color + '" font-weight="600" opacity="0.85">' + dot.label + '</text>';
+      html += '</g>';
     });
 
     // Y-axis line
@@ -391,9 +388,9 @@
       const pid = p.label.replace(/\s+/g, '-').toLowerCase();
       const isPsheHov = state.activePsheId === pid;
       html += '<g class="pshe-label" data-pshe-id="' + pid + '" style="cursor:pointer">';
-      html += '<text x="' + labelX + '" y="' + (sy - 3) + '" font-family="SuperSans, sans-serif" font-size="12" fill="' + COLORS.textPrimary + '" text-anchor="end" font-weight="600">' + p.label + '</text>';
+      html += '<text x="' + labelX + '" y="' + (sy - 3) + '" font-family="Inter, sans-serif" font-size="12" fill="' + COLORS.textPrimary + '" text-anchor="end" font-weight="600">' + p.label + '</text>';
       if (isPsheHov) {
-        html += '<text x="' + labelX + '" y="' + (sy + 11) + '" font-family="SuperSerif, serif" font-size="9" font-weight="300" fill="' + COLORS.textMuted + '" text-anchor="end">' + p.sub + '</text>';
+        html += '<text x="' + labelX + '" y="' + (sy + 11) + '" font-family="DM Serif Display, serif" font-size="9" font-weight="300" fill="' + COLORS.textMuted + '" text-anchor="end">' + p.sub + '</text>';
       }
       html += '<line x1="' + (PL - 4) + '" y1="' + sy + '" x2="' + PL + '" y2="' + sy + '" stroke="' + COLORS.textMuted + '" stroke-width="1"/></g>';
     });
@@ -403,16 +400,16 @@
       const expertBand = LEVEL_BANDS.find(l => l.id === 'expert');
       const [leftX, leftY] = toSVG(expertBand.cx - expertBand.rx * 0.85, expertBand.cy);
       const [rightX, rightY] = toSVG(expertBand.cx + expertBand.rx * 0.85, expertBand.cy);
-      html += '<text x="' + leftX + '" y="' + (leftY + 4) + '" font-family="SuperSans, sans-serif" font-size="10" font-weight="700" fill="' + COLORS.heart80 + '" opacity="0.7">Craft Expert</text>';
-      html += '<text x="' + rightX + '" y="' + (rightY + 4) + '" font-family="SuperSans, sans-serif" font-size="10" font-weight="700" fill="' + COLORS.heart80 + '" opacity="0.7" text-anchor="end">Problem Expert</text>';
+      html += '<text x="' + leftX + '" y="' + (leftY + 4) + '" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="' + COLORS.heart80 + '" opacity="0.7">Craft Expert</text>';
+      html += '<text x="' + rightX + '" y="' + (rightY + 4) + '" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="' + COLORS.heart80 + '" opacity="0.7" text-anchor="end">Problem Expert</text>';
     }
 
-    // X-axis: arrow + main label 28px below + Narrow / Broad cues
+    // X-axis: arrow + Low / High + dimension list
     const xAxisY = PT + PH;
     html += '<line x1="' + PL + '" y1="' + xAxisY + '" x2="' + (PL + PW) + '" y2="' + xAxisY + '" stroke="' + COLORS.textFaint + '" stroke-width="2" marker-end="url(#arrowhead)"/>';
-    html += '<text x="' + (PL + PW / 2) + '" y="' + (xAxisY + 28) + '" font-family="SuperSans, sans-serif" font-size="11" fill="' + COLORS.textSecond + '" font-weight="500" text-anchor="middle">Complexity · Scope · # of Directs · Ambiguity</text>';
-    html += '<text x="' + PL + '" y="' + (xAxisY + 28) + '" font-family="SuperSans, sans-serif" font-size="10" fill="' + COLORS.textFaint + '" font-weight="600" text-anchor="start">← Narrow</text>';
-    html += '<text x="' + (PL + PW) + '" y="' + (xAxisY + 28) + '" font-family="SuperSans, sans-serif" font-size="10" fill="' + COLORS.textFaint + '" font-weight="600" text-anchor="end">Broad →</text>';
+    html += '<text x="' + PL + '" y="' + (xAxisY + 22) + '" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="' + COLORS.textPrimary + '" text-anchor="start">Low</text>';
+    html += '<text x="' + (PL + PW) + '" y="' + (xAxisY + 22) + '" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="' + COLORS.textPrimary + '" text-anchor="end">High</text>';
+    html += '<text x="' + (PL + PW / 2) + '" y="' + (xAxisY + 22) + '" font-family="Inter, sans-serif" font-size="10" font-weight="400" fill="' + COLORS.textMuted + '" text-anchor="middle">scope · complexity · ambiguity · craft · leading others · team amplification</text>';
 
     svg.innerHTML = html;
 
@@ -441,21 +438,45 @@
       }
     });
 
-    // Re-attach blob hover
+    // Level blob click (toggle)
     svg.querySelectorAll('.level-blob').forEach(g => {
       const id = g.getAttribute('data-id');
-      g.addEventListener('mouseenter', () => { state.activeLevelId = id; updateFloatingCard(); render(); });
-      g.addEventListener('mouseleave', () => { state.activeLevelId = null; updateFloatingCard(); render(); });
+      g.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.activeLevelId = state.activeLevelId === id ? null : id;
+        state.activePsheId = null;
+        state.activeExampleDotId = null;
+        updateFloatingCard();
+        render();
+      });
     });
 
-    // Y-axis label hover
+    // PSHE label click (toggle)
     svg.querySelectorAll('.pshe-label').forEach(g => {
       const pid = g.getAttribute('data-pshe-id');
-      g.addEventListener('mouseenter', () => { state.activePsheId = pid; updateFloatingCard(); render(); });
-      g.addEventListener('mouseleave', () => { state.activePsheId = null; updateFloatingCard(); render(); });
+      g.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.activePsheId = state.activePsheId === pid ? null : pid;
+        state.activeLevelId = null;
+        state.activeExampleDotId = null;
+        updateFloatingCard();
+        render();
+      });
     });
 
-    // Floating card: level hover wins, then pshe hover, then active path description
+    // Example dot click (toggle)
+    svg.querySelectorAll('.example-dot-g').forEach(g => {
+      const id = g.getAttribute('data-dot-id');
+      g.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.activeExampleDotId = state.activeExampleDotId === id ? null : id;
+        state.activeLevelId = null;
+        state.activePsheId = null;
+        updateFloatingCard();
+        render();
+      });
+    });
+
     updateFloatingCard();
 
     // Path buttons (toolbar style)
@@ -485,13 +506,16 @@
   }
 
   function updateFloatingCard() {
+    const activeDot = state.activeExampleDotId ? EXAMPLE_DOTS.find(d => d.id === state.activeExampleDotId) : null;
     const activeLevel = LEVEL_BANDS.find(l => l.id === state.activeLevelId);
     const activePshe = state.activePsheId ? PSHE_ZONES.find(z => z.label.replace(/\s+/g, '-').toLowerCase() === state.activePsheId) : null;
     const visiblePaths = state.showAllPaths ? PATHS : PATHS.filter(p => state.activePathIds.has(p.id));
-    const singlePathActive = !activeLevel && !activePshe && visiblePaths.length === 1 ? visiblePaths[0] : null;
+    const singlePathActive = !activeDot && !activeLevel && !activePshe && visiblePaths.length === 1 ? visiblePaths[0] : null;
 
-    if (activeLevel) {
-      floatingCard.classList.add('visible');
+    if (activeDot) {
+      floatingCard.style.borderLeftColor = activeDot.color;
+      levelContent.innerHTML = '<div class="card-title" style="color:' + activeDot.color + '">' + activeDot.title + '</div><div class="card-body">' + activeDot.desc + '</div>';
+    } else if (activeLevel) {
       floatingCard.style.borderLeftColor = activeLevel.color;
       if (activeLevel.id === 'expert' && activeLevel.headline && activeLevel.quote) {
         levelContent.innerHTML = '<div class="card-title" style="color:' + activeLevel.color + '">' + activeLevel.label + '</div>' +
@@ -502,17 +526,14 @@
         levelContent.innerHTML = '<div class="card-title" style="color:' + activeLevel.color + '">' + activeLevel.label + '</div><div class="card-body">' + activeLevel.info + '</div>';
       }
     } else if (activePshe) {
-      floatingCard.classList.add('visible');
       floatingCard.style.borderLeftColor = COLORS.myst60;
-      levelContent.innerHTML = '<div class="card-title" style="color:' + COLORS.textPrimary + '">' + activePshe.label + '</div><div class="card-body">' + activePshe.sub + '</div>';
+      levelContent.innerHTML = '<div class="card-title" style="color:' + COLORS.textPrimary + '">' + activePshe.label + '</div><div class="card-body">' + activePshe.desc + '</div>';
     } else if (singlePathActive) {
-      floatingCard.classList.add('visible');
       floatingCard.style.borderLeftColor = singlePathActive.color;
       levelContent.innerHTML = '<div class="card-title" style="color:' + singlePathActive.color + '">' + singlePathActive.label + '</div><div class="card-body">' + singlePathActive.info + '</div>';
     } else {
-      floatingCard.classList.remove('visible');
-      floatingCard.style.borderLeftColor = '';
-      levelContent.innerHTML = '<span class="card-placeholder">Hover a zone or toggle a path</span>';
+      floatingCard.style.borderLeftColor = COLORS.border;
+      levelContent.innerHTML = '<span class="card-placeholder">Click a level zone or career stage to learn more.</span>';
     }
   }
 
@@ -601,6 +622,17 @@
 
   svg.addEventListener('mouseup', () => { state.isDrawing = false; });
   svg.addEventListener('mouseleave', () => { state.isDrawing = false; });
+
+  // Click elsewhere on SVG: clear selection
+  svg.addEventListener('click', (e) => {
+    if (!e.target.closest('.level-blob') && !e.target.closest('.pshe-label') && !e.target.closest('.example-dot-g')) {
+      state.activeLevelId = null;
+      state.activePsheId = null;
+      state.activeExampleDotId = null;
+      updateFloatingCard();
+      render();
+    }
+  });
 
   document.getElementById('foot-note').textContent = "Project Metro · from Leah's whiteboard · " + new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
